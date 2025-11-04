@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">TravelWise</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="app_logo">App Logo</string>
+    <string name="explore_the_nworld_your_way">Explore the\nWorld, Your Way</string>
+    <string name="discover_amazing_places_and_create_nunforgettable_memories">Discover amazing places and create\nunforgettable memories</string>
+    <string name="explore_now">Explore Now</string>
+    <string name="explore_now2">EXPLORE NOW</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="login">Login</string>
+</resources>

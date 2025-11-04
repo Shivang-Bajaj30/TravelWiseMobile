@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <!-- Header -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:text="My Trips"
+        android:textColor="@color/text_primary"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Empty State Container -->
+    <LinearLayout
+        android:id="@+id/emptyStateLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle">
+
+        <!-- Empty State Image -->
+        <ImageView
+            android:id="@+id/ivEmptyState"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/icon12"
+            android:contentDescription="No trips yet"
+            android:alpha="0.9" />
+
+        <!-- Empty State Title -->
+        <TextView
+            android:id="@+id/tvEmptyStateTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="No trips yet!"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!-- Empty State Message -->
+        <TextView
+            android:id="@+id/tvEmptyStateMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="Your adventure awaits!\nStart planning your dream vacation today."
+            android:textAlignment="center"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp"
+            android:lineSpacingExtra="4dp" />
+
+        <!-- Explore Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExploreDestinations"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="Explore Destinations"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="28dp"
+            app:backgroundTint="#F7F64B9A" />
+
+    </LinearLayout>
+
+    <!-- Trips RecyclerView (Hidden for now) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTrips"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+        tools:listitem="@layout/item_trip_card" />
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:background="@android:color/white"
+        app:itemIconTint="@color/bottom_nav_icon_color"
+        app:itemTextColor="@color/bottom_nav_text_color"
+        app:itemRippleColor="@color/primary_light"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

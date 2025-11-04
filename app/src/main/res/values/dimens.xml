@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Card spacing for horizontal RecyclerView -->
+    <dimen name="card_spacing">12dp</dimen>
+</resources>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.travelwise">
+
+    <!-- Internet Permission for loading images from URLs in future -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.TravelWise"
+        android:usesCleartextTraffic="true">
+
+        <!-- Splash Screen (Main Launcher) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.TravelWise">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Login Activity -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TravelWise" />
+
+        <!-- Signup Activity -->
+        <activity
+            android:name=".SignupActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TravelWise" />
+
+        <!-- Home Activity -->
+        <activity
+            android:name=".ui.home.HomeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TravelWise"
+            android:windowSoftInputMode="stateHidden" />
+
+        <!-- Destination Detail Activity -->
+        <activity
+            android:name=".DestinationDetailActivity"
+            android:exported="false" />
+
+        <!-- Favorites Activity -->
+        <activity
+            android:name=".FavoritesActivity"
+            android:exported="false" />
+
+        <!-- Trips Activity -->
+        <activity
+            android:name=".TripsActivity"
+            android:exported="false" />
+
+        <!-- Profile Activity -->
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+
+        <!-- Flight Activity -->
+        <activity
+            android:name=".FlightActivity"
+            android:exported="false" />
+
+        <!-- Hotel Activity -->
+        <activity
+            android:name=".HotelActivity"
+            android:exported="false" />
+
+        <!-- Car Activity -->
+        <activity
+            android:name=".CarActivity"
+            android:exported="false" />
+
+        <!-- Meal Activity -->
+        <activity
+            android:name=".MealActivity"
+            android:exported="false" />
+
+        <!-- All Destinations Activity -->
+        <activity
+            android:name=".AllDestinationsActivity"
+            android:exported="false" />
+
+        <!-- AI Trip Plan Activity -->
+        <activity
+            android:name=".AiTripPlanActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TravelWise" />
+
+    </application>
+
+</manifest>

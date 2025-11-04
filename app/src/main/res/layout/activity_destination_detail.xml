@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="@android:color/transparent"
+            app:expandedTitleMarginStart="0dp"
+            app:expandedTitleMarginEnd="0dp">
+
+            <!-- Image ViewPager for Swipeable Images -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/imageViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_collapseMode="parallax"/>
+
+            <!-- Gradient Overlay at Bottom of Images -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/gradient_overlay"/>
+
+            <!-- Back Button -->
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="16dp"
+                android:background="@drawable/circle_background_white"
+                android:src="@drawable/ic_arrow_back"
+                android:tint="@color/text_primary"
+                android:contentDescription="Back"
+                android:elevation="4dp"/>
+
+            <!-- Share Button -->
+            <ImageButton
+                android:id="@+id/btnShare"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="16dp"
+                android:layout_gravity="end"
+                android:background="@drawable/circle_background_white"
+                android:src="@drawable/ic_share"
+                android:tint="@color/text_primary"
+                android:contentDescription="Share"
+                android:elevation="4dp"/>
+
+            <!-- Image Indicator Dots -->
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/imageIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="16dp"
+                app:tabBackground="@drawable/tab_indicator_selector"
+                app:tabGravity="center"
+                app:tabIndicatorHeight="0dp"
+                app:tabMaxWidth="8dp"
+                app:tabMinWidth="8dp"
+                app:tabPaddingStart="4dp"
+                app:tabPaddingEnd="4dp"/>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:paddingBottom="100dp">
+
+            <!-- Destination Title -->
+            <TextView
+                android:id="@+id/tvDestinationName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Matsumoto Castle"
+                android:textSize="28sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Location -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_location"
+                    android:tint="@color/text_secondary"
+                    android:contentDescription="Location"/>
+
+                <TextView
+                    android:id="@+id/tvLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Osaka, Japan"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
+
+            <!-- Info Cards (Distance, Temperature, Rating) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <!-- Distance Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:padding="12dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_distance"
+                            android:tint="@color/primary"
+                            android:contentDescription="Distance"/>
+
+                        <TextView
+                            android:id="@+id/tvDistance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2.3 KM"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:layout_marginStart="6dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Temperature Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:padding="12dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_temperature"
+                            android:tint="@color/primary"
+                            android:contentDescription="Temperature"/>
+
+                        <TextView
+                            android:id="@+id/tvTemperature"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="17°C"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:layout_marginStart="6dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Rating Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:padding="12dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_star"
+                            android:tint="#FFD700"
+                            android:contentDescription="Rating"/>
+
+                        <TextView
+                            android:id="@+id/tvRating"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4.8"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:layout_marginStart="6dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Description Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Description"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Beautiful historic castle with stunning architecture and rich cultural heritage. Perfect destination for history enthusiasts and photography lovers."
+                android:textSize="15sp"
+                android:textColor="@color/text_secondary"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Itinerary Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Itinerary Overview"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Itinerary Items -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvItinerary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:nestedScrollingEnabled="false"/>
+
+            <!-- Popular Places Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Popular Places to Visit"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Popular Places RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPopularPlaces"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Custom Bottom Navigation -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:elevation="16dp"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- Price Section -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Starting at"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"/>
+
+            <TextView
+                android:id="@+id/tvPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₹23,000"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- Explore/Get Started Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGetStarted"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1.2"
+            android:text="Get Started"
+            android:textSize="16sp"
+            android:textAllCaps="false"
+            android:fontFamily="sans-serif-medium"
+            app:cornerRadius="28dp"
+            app:backgroundTint="#E63A71"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"/>
+
+        <!-- Favorite Heart Icon -->
+        <ImageButton
+            android:id="@+id/btnFavorite"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_favorite_border"
+            android:background="@drawable/circle_background_light"
+            android:tint="#E90520"
+            android:contentDescription="Add to favorites"
+            android:scaleType="centerInside"
+            android:padding="14dp"/>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
