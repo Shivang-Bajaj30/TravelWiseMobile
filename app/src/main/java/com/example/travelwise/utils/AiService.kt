@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit
 class AiService {
 
     private val apiKey: String = BuildConfig.GEMINI_API_KEY
+
     private val gson = Gson()
     private val client: OkHttpClient = OkHttpClient.Builder()
         .callTimeout(90, TimeUnit.SECONDS)
