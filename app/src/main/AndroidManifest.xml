@@ -103,6 +103,12 @@
             android:exported="false"
             android:theme="@style/Theme.TravelWise" />
 
+        <!-- Itinerary Results Activity -->
+        <activity
+            android:name=".ItineraryResultsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TravelWise" />
+
     </application>
 
 </manifest>

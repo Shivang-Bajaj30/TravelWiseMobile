@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Pink Dotted Line running through the card and extending to next -->
+        <View
+            android:id="@+id/viewTimeline"
+            android:layout_width="2dp"
+            android:layout_height="1000dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="-900dp"
+            android:background="@drawable/dotted_line_vertical_pink" />
+
+        <!-- Day Number Circle -->
+        <TextView
+            android:id="@+id/tvDayNumber"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:gravity="center"
+            android:text="Day 1"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:background="@drawable/circle_background_primary" />
+
+        <!-- Day Image -->
+        <ImageView
+            android:id="@+id/ivDayImage"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@id/tvDayNumber"
+            android:scaleType="centerCrop"
+            android:background="@drawable/image11"
+            android:clipToOutline="true" />
+
+        <!-- Day Content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@id/ivDayImage"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nov 05"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/tvDateFull"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="November 5, 2025"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+        <!-- Activities Container -->
+        <LinearLayout
+            android:id="@+id/llActivities"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvDayNumber"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical" />
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>
