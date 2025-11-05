@@ -33,6 +33,14 @@ class LoginActivity : AppCompatActivity() {
                 // ✅ Extract username (first part of email)
                 val username = email.substringBefore("@")
 
+                // ✅ Persist session
+                val prefs = getSharedPreferences("TravelWisePrefs", MODE_PRIVATE)
+                prefs.edit()
+                    .putString("USERNAME", username)
+                    .putString("EMAIL", email)
+                    .putBoolean("LOGGED_IN", true)
+                    .apply()
+
                 // ✅ Start HomeActivity and pass username
                 val intent = Intent(this, HomeActivity::class.java).apply {
                     putExtra("USERNAME", username)

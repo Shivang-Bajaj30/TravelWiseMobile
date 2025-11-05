@@ -92,6 +92,11 @@ class ProfileActivity : AppCompatActivity() {
                     finish() // Add finish() here to prevent activity stack buildup
                     true
                 }
+                R.id.nav_trips -> {
+                    startActivity(Intent(this, TripsActivity::class.java))
+                    finish()
+                    true
+                }
                 R.id.nav_profile -> true
                 else -> false
             }

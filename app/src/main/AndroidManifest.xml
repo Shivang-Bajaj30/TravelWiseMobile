@@ -43,7 +43,7 @@
             android:name=".ui.home.HomeActivity"
             android:exported="false"
             android:theme="@style/Theme.TravelWise"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- Destination Detail Activity -->
         <activity
@@ -68,27 +68,32 @@
         <!-- Flight Activity -->
         <activity
             android:name=".FlightActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- Hotel Activity -->
         <activity
             android:name=".HotelActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- Car Activity -->
         <activity
             android:name=".CarActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- Meal Activity -->
         <activity
             android:name=".MealActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- All Destinations Activity -->
         <activity
             android:name=".AllDestinationsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- AI Trip Plan Activity -->
         <activity
