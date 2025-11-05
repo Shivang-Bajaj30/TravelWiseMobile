@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:src="@drawable/image9"
         android:scaleType="centerCrop"
-        android:contentDescription="Background"/>
+        android:contentDescription="@string/background2"/>
 
     <!-- Overlay for better text visibility -->
     <View

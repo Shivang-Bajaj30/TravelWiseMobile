@@ -42,12 +42,12 @@ class AllDestinationsActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        destinationAdapter = DestinationAdapter(displayedDestinations) { destination ->
+        destinationAdapter = DestinationAdapter(displayedDestinations, { destination ->
             openDestinationDetail(destination)
-        }
+        }, R.layout.item_destination_card_full)
 
-        // Use GridLayoutManager for 2 columns on larger screens, 1 column on smaller screens
-        val spanCount = if (resources.configuration.screenWidthDp >= 600) 2 else 1
+        // Full width cards → single column
+        val spanCount = 1
         binding.rvAllDestinations.apply {
             layoutManager = GridLayoutManager(this@AllDestinationsActivity, spanCount)
             adapter = destinationAdapter

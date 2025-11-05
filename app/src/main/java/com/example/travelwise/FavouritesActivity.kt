@@ -45,9 +45,12 @@ class FavoritesActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = DestinationAdapter(displayedDestinations) { destination ->
-            openDestinationDetail(destination)
-        }
+        adapter = DestinationAdapter(
+            destinations = displayedDestinations,
+            onItemClick = { destination ->
+                openDestinationDetail(destination)
+            }
+        )
 
         binding.rvFavorites.apply {
             layoutManager = LinearLayoutManager(this@FavoritesActivity)

@@ -69,13 +69,18 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="16dp"
+                android:background="@android:color/transparent"
                 app:tabBackground="@drawable/tab_indicator_selector"
+                app:tabRippleColor="@android:color/transparent"
+                app:tabIndicatorColor="@android:color/transparent"
                 app:tabGravity="center"
                 app:tabIndicatorHeight="0dp"
                 app:tabMaxWidth="8dp"
                 app:tabMinWidth="8dp"
-                app:tabPaddingStart="4dp"
-                app:tabPaddingEnd="4dp"/>
+                app:tabPaddingStart="6dp"
+                app:tabPaddingEnd="6dp"
+                app:tabPaddingTop="4dp"
+                app:tabPaddingBottom="4dp"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

@@ -30,13 +30,15 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false"
-            android:theme="@style/Theme.TravelWise" />
+            android:theme="@style/Theme.TravelWise"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- Signup Activity -->
         <activity
             android:name=".SignupActivity"
             android:exported="false"
-            android:theme="@style/Theme.TravelWise" />
+            android:theme="@style/Theme.TravelWise"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- Home Activity -->
         <activity
