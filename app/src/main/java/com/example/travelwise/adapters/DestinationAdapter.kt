@@ -10,10 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.travelwise.R
 import com.example.travelwise.models.Destination
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.annotation.LayoutRes
 
 class DestinationAdapter(
     private val destinations: List<Destination>,
-    private val onItemClick: (Destination) -> Unit
+    private val onItemClick: (Destination) -> Unit,
+    @LayoutRes private val itemLayoutResId: Int = R.layout.item_destination_card
 ) : RecyclerView.Adapter<DestinationAdapter.DestinationViewHolder>() {
 
     inner class DestinationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -58,7 +60,7 @@ class DestinationAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DestinationViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_destination_card, parent, false)
+            .inflate(itemLayoutResId, parent, false)
         return DestinationViewHolder(view)
     }
 

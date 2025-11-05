@@ -110,9 +110,12 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        destinationAdapter = DestinationAdapter(displayedDestinations) { destination ->
-            openDestinationDetail(destination)
-        }
+        destinationAdapter = DestinationAdapter(
+            destinations = displayedDestinations,
+            onItemClick = { destination ->
+                openDestinationDetail(destination)
+            }
+        )
 
         binding.rvDestinations.apply {
             layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
