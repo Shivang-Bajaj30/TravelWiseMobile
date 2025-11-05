@@ -10,4 +10,6 @@
     <string name="explore_now2">EXPLORE NOW</string>
     <string name="sign_up">Sign Up</string>
     <string name="login">Login</string>
+    <string name="background">Background</string>
+    <string name="back">Back</string>
 </resources>

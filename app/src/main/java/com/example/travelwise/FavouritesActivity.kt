@@ -193,6 +193,11 @@ class FavoritesActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_favorites -> true
+                R.id.nav_trips -> {
+                    startActivity(Intent(this, TripsActivity::class.java))
+                    finish()
+                    true
+                }
                 R.id.nav_profile -> {
                     // FIXED: Added navigation to profile
                     startActivity(Intent(this, ProfileActivity::class.java))

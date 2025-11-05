@@ -2,8 +2,6 @@ package com.example.travelwise.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,15 +36,20 @@ class HomeActivity : AppCompatActivity() {
         // Hide action bar
         supportActionBar?.hide()
 
-        // Get username from intent or show default
-        val username = intent.getStringExtra("USERNAME") ?: "Traveler"
-
-        // Extract first name (before dot or any separator)
-        val firstName = username.split(".", "_", " ")[0]
-
-        // Capitalize first letter and set greeting text
-        val displayName = firstName.replaceFirstChar { it.uppercase() }
-        binding.tvGreeting.text = "Welcome, $displayName!"
+        // Resolve username from persistent storage, fallback to intent, then default
+        val prefs = getSharedPreferences("TravelWisePrefs", MODE_PRIVATE)
+        var storedUsername = prefs.getString("USERNAME", null)
+        if (storedUsername.isNullOrBlank()) {
+            val intentUsername = intent.getStringExtra("USERNAME")
+            if (!intentUsername.isNullOrBlank()) {
+                storedUsername = intentUsername
+                prefs.edit().putString("USERNAME", storedUsername).apply()
+            }
+        }
+        val effectiveUsername = (storedUsername ?: "Traveler")
+            .split(".", "_", " ")[0]
+            .replaceFirstChar { it.uppercase() }
+        binding.tvGreeting.text = "Welcome, $effectiveUsername!"
 
         // Prevent search bar from auto-focusing on activity start
         // Use post to ensure it happens after layout is complete
@@ -69,7 +72,7 @@ class HomeActivity : AppCompatActivity() {
         // Load sample destinations
         loadSampleData()
 
-        // Setup dynamic search
+        // Setup search submit action (no dynamic filtering)
         setupSearch()
 
         // Bottom navigation
@@ -131,16 +134,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupSearch() {
-        binding.etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                filterDestinations(s.toString())
-            }
-        })
-
         // Navigate to AI Trip planner when user submits via keyboard action
         binding.etSearch.setOnEditorActionListener { v, actionId, event ->
             val query = binding.etSearch.text?.toString()?.trim() ?: ""

@@ -75,6 +75,14 @@ class SignupActivity : AppCompatActivity() {
                 // For now, just navigate to HomeActivity
                 // In production, you would register the user with a backend
                 Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT).show()
+                // ✅ Persist session
+                val username = fullName.substringBefore(" ")
+                val prefs = getSharedPreferences("TravelWisePrefs", MODE_PRIVATE)
+                prefs.edit()
+                    .putString("USERNAME", username)
+                    .putString("EMAIL", email)
+                    .putBoolean("LOGGED_IN", true)
+                    .apply()
                 val intent = Intent(this, HomeActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
