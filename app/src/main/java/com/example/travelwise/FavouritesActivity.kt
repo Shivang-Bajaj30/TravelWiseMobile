@@ -1,12 +1,14 @@
 package com.example.travelwise
 
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.travelwise.adapters.DestinationAdapter
 import com.example.travelwise.databinding.ActivityFavoritesBinding
 import com.example.travelwise.models.Destination
@@ -28,14 +30,7 @@ class FavoritesActivity : AppCompatActivity() {
         supportActionBar?.hide()
         favoritesManager = FavoritesManager(this)
 
-        // Prevent search bar from auto-focusing
-//        binding.root.post {
-//            binding.etSearch.clearFocus()
-//            binding.root.requestFocus()
-//        }
-
         setupRecyclerView()
-//        setupSearch()
         setupBottomNavigation()
     }
 
@@ -53,41 +48,35 @@ class FavoritesActivity : AppCompatActivity() {
         )
 
         binding.rvFavorites.apply {
-            layoutManager = LinearLayoutManager(this@FavoritesActivity)
+            // Changed from LinearLayoutManager to GridLayoutManager with 2 columns
+            layoutManager = GridLayoutManager(this@FavoritesActivity, 2)
+
+            // Add spacing between grid items (12dp converted to pixels)
+            val spacingInPixels = (12 * resources.displayMetrics.density).toInt()
+            addItemDecoration(GridSpacingItemDecoration(2, spacingInPixels, true))
+
             adapter = this@FavoritesActivity.adapter
         }
     }
 
-//    private fun setupSearch() {
-//        binding.etSearch.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-//
-//            override fun afterTextChanged(s: Editable?) {
-//                filterDestinations(s.toString())
-//            }
-//        })
-//    }
-
     private fun filterDestinations(query: String) {
         val searchQuery = query.trim().lowercase()
-        
+
         displayedDestinations.clear()
-        
+
         if (searchQuery.isEmpty()) {
             displayedDestinations.addAll(allDestinations)
         } else {
             displayedDestinations.addAll(
                 allDestinations.filter { destination ->
                     destination.name.lowercase().contains(searchQuery) ||
-                    destination.location.lowercase().contains(searchQuery)
+                            destination.location.lowercase().contains(searchQuery)
                 }
             )
         }
-        
+
         adapter.notifyDataSetChanged()
-        
+
         // Update empty state visibility
         if (displayedDestinations.isEmpty()) {
             binding.tvEmptyState.visibility = View.VISIBLE
@@ -184,13 +173,11 @@ class FavoritesActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigation() {
-        // FIXED: Changed from bottomNavigation to bottomNavigation (to match XML)
         binding.bottomNavigation.selectedItemId = R.id.nav_favorites
 
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
-                    // FIXED: Properly navigate to home instead of just finishing
                     startActivity(Intent(this, HomeActivity::class.java))
                     finish()
                     true
@@ -202,12 +189,40 @@ class FavoritesActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_profile -> {
-                    // FIXED: Added navigation to profile
                     startActivity(Intent(this, ProfileActivity::class.java))
                     finish()
                     true
                 }
                 else -> false
+            }
+        }
+    }
+
+    // GridSpacingItemDecoration class to add equal spacing between grid items
+    inner class GridSpacingItemDecoration(
+        private val spanCount: Int,
+        private val spacing: Int,
+        private val includeEdge: Boolean
+    ) : RecyclerView.ItemDecoration() {
+
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            val position = parent.getChildAdapterPosition(view)
+            val column = position % spanCount
+
+            if (includeEdge) {
+                outRect.left = spacing - column * spacing / spanCount
+                outRect.right = (column + 1) * spacing / spanCount
+
+                if (position < spanCount) {
+                    outRect.top = spacing
+                }
+                outRect.bottom = spacing
+            } else {
+                outRect.left = column * spacing / spanCount
+                outRect.right = spacing - (column + 1) * spacing / spanCount
+                if (position >= spanCount) {
+                    outRect.top = spacing
+                }
             }
         }
     }
