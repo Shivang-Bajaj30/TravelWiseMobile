@@ -94,13 +94,43 @@ class AiTripPlanActivity : AppCompatActivity() {
             val end = binding.etEndDate.text.toString().trim()
             val notes = binding.etAdditionalInfo.text.toString().trim()
 
+            // Validate all required fields
+            var isValid = true
+
             if (dest.isEmpty()) {
                 binding.etDestination.error = "Destination is required"
-                return@setOnClickListener
+                isValid = false
             }
 
-            if (people.isNotEmpty() && people.toIntOrNull() == null) {
-                binding.etPeople.error = "Enter a valid number"
+            if (budget.isEmpty()) {
+                binding.etBudget.error = "Budget is required"
+                isValid = false
+            } else if (budget.toDoubleOrNull() == null) {
+                binding.etBudget.error = "Enter a valid budget amount"
+                isValid = false
+            }
+
+            if (people.isEmpty()) {
+                binding.etPeople.error = "Number of people is required"
+                isValid = false
+            } else if (people.toIntOrNull() == null || people.toInt() <= 0) {
+                binding.etPeople.error = "Enter a valid number of people"
+                isValid = false
+            }
+
+            if (start.isEmpty()) {
+                binding.etStartDate.error = "Start date is required"
+                isValid = false
+            }
+
+            if (end.isEmpty()) {
+                binding.etEndDate.error = "End date is required"
+                isValid = false
+            }
+
+            // Additional info is optional, no validation needed
+
+            if (!isValid) {
                 return@setOnClickListener
             }
 
@@ -157,10 +187,10 @@ class AiTripPlanActivity : AppCompatActivity() {
         val sb = StringBuilder()
         sb.appendLine("You are a helpful travel planner. Create a concise, day-by-day trip plan.")
         sb.appendLine("Destination: $destination")
-        if (budget.isNotBlank()) sb.appendLine("Budget: $budget")
-        if (peopleCount.isNotBlank()) sb.appendLine("Number of people: $peopleCount")
-        if (startDate.isNotBlank()) sb.appendLine("Start date: $startDate")
-        if (endDate.isNotBlank()) sb.appendLine("End date: $endDate")
+        sb.appendLine("Budget: $budget")
+        sb.appendLine("Number of people: $peopleCount")
+        sb.appendLine("Start date: $startDate")
+        sb.appendLine("End date: $endDate")
         if (notes.isNotBlank()) sb.appendLine("Additional preferences: $notes")
         sb.appendLine()
         sb.appendLine("Please include:")
