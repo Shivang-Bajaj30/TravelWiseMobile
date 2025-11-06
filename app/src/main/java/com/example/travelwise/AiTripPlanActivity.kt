@@ -3,18 +3,18 @@ package com.example.travelwise
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.travelwise.databinding.ActivityAiTripPlanBinding
-import com.example.travelwise.utils.AiService
+import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.generationConfig
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class AiTripPlanActivity : AppCompatActivity() {
 
@@ -85,8 +85,15 @@ class AiTripPlanActivity : AppCompatActivity() {
     private fun setupActions() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
+        val generativeModel = GenerativeModel(
+            modelName = BuildConfig.GEMINI_MODEL,
+            apiKey = BuildConfig.GEMINI_API_KEY,
+            generationConfig = generationConfig {
+                responseMimeType = "application/json"
+            }
+        )
+
         binding.btnGenerate.setOnClickListener {
-            // Placeholder: Later this will trigger AI generation
             val dest = binding.etDestination.text.toString().trim()
             val budget = binding.etBudget.text.toString().trim()
             val people = binding.etPeople.text.toString().trim()
@@ -94,71 +101,31 @@ class AiTripPlanActivity : AppCompatActivity() {
             val end = binding.etEndDate.text.toString().trim()
             val notes = binding.etAdditionalInfo.text.toString().trim()
 
-            // Validate all required fields
-            var isValid = true
-
-            if (dest.isEmpty()) {
-                binding.etDestination.error = "Destination is required"
-                isValid = false
-            }
-
-            if (budget.isEmpty()) {
-                binding.etBudget.error = "Budget is required"
-                isValid = false
-            } else if (budget.toDoubleOrNull() == null) {
-                binding.etBudget.error = "Enter a valid budget amount"
-                isValid = false
-            }
-
-            if (people.isEmpty()) {
-                binding.etPeople.error = "Number of people is required"
-                isValid = false
-            } else if (people.toIntOrNull() == null || people.toInt() <= 0) {
-                binding.etPeople.error = "Enter a valid number of people"
-                isValid = false
-            }
-
-            if (start.isEmpty()) {
-                binding.etStartDate.error = "Start date is required"
-                isValid = false
-            }
-
-            if (end.isEmpty()) {
-                binding.etEndDate.error = "End date is required"
-                isValid = false
-            }
-
-            // Additional info is optional, no validation needed
-
-            if (!isValid) {
+            if (!validateInputs(dest, budget, people, start, end)) {
                 return@setOnClickListener
             }
 
-            val prompt = buildPrompt(
-                destination = dest,
-                budget = budget,
-                peopleCount = people,
-                startDate = start,
-                endDate = end,
-                notes = notes
-            )
+            val prompt = buildPrompt(dest, budget, people, start, end, notes)
 
             // UI state
             binding.btnGenerate.isEnabled = false
             binding.btnGenerate.text = "Generating..."
             binding.tvOutput.visibility = View.VISIBLE
-            binding.tvOutput.text = "Generating trip plan..."
+            binding.tvOutput.text = "Generating structured trip plan..."
 
             lifecycleScope.launch {
                 try {
-                    val result = withContext(Dispatchers.IO) {
-                        AiService().generateTripPlan(prompt)
+                    val response = generativeModel.generateContent(prompt)
+                    val result = response.text
+
+                    if (result == null) {
+                        handleGenerationFailure("Empty response from AI.")
+                        return@launch
                     }
-                    
-                    // Navigate to results page with generated itinerary
+
+                    // Navigate to results page with generated JSON itinerary
                     val intent = Intent(this@AiTripPlanActivity, ItineraryResultsActivity::class.java).apply {
                         putExtra("DESTINATION", dest)
-                        putExtra("ORIGIN", extractOrigin(dest)) // Try to extract origin if available
                         putExtra("START_DATE", start)
                         putExtra("END_DATE", end)
                         putExtra("PEOPLE_COUNT", people)
@@ -167,13 +134,42 @@ class AiTripPlanActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish() // Close the form activity
                 } catch (e: Exception) {
-                    binding.tvOutput.visibility = View.VISIBLE
-                    binding.tvOutput.text = "Failed to generate plan: ${e.message}"
-                    binding.btnGenerate.isEnabled = true
-                    binding.btnGenerate.text = "Generate Plan"
+                    Log.e("AiTripPlan", "Error generating plan", e)
+                    handleGenerationFailure("Failed to generate plan: ${e.message}")
                 }
             }
         }
+    }
+    
+    private fun validateInputs(dest: String, budget: String, people: String, start: String, end: String): Boolean {
+        if (dest.isEmpty()) {
+            binding.etDestination.error = "Destination is required"
+            return false
+        }
+        if (budget.isEmpty()) {
+            binding.etBudget.error = "Budget is required"
+            return false
+        }
+        if (people.isEmpty()) {
+            binding.etPeople.error = "Number of people is required"
+            return false
+        }
+        if (start.isEmpty()) {
+            binding.etStartDate.error = "Start date is required"
+            return false
+        }
+        if (end.isEmpty()) {
+            binding.etEndDate.error = "End date is required"
+            return false
+        }
+        return true
+    }
+    
+    private fun handleGenerationFailure(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        binding.btnGenerate.isEnabled = true
+        binding.btnGenerate.text = "Generate Plan"
+        binding.tvOutput.text = message
     }
 
     private fun buildPrompt(
@@ -184,36 +180,46 @@ class AiTripPlanActivity : AppCompatActivity() {
         endDate: String,
         notes: String
     ): String {
-        val sb = StringBuilder()
-        sb.appendLine("You are a helpful travel planner. Create a concise, day-by-day trip plan.")
-        sb.appendLine("Destination: $destination")
-        sb.appendLine("Budget: $budget")
-        sb.appendLine("Number of people: $peopleCount")
-        sb.appendLine("Start date: $startDate")
-        sb.appendLine("End date: $endDate")
-        if (notes.isNotBlank()) sb.appendLine("Additional preferences: $notes")
-        sb.appendLine()
-        sb.appendLine("Please include:")
-        sb.appendLine("- Recommended daily itinerary with major attractions")
-        sb.appendLine("- Suggested hotels in different price tiers")
-        sb.appendLine("- Local transport tips and approximate costs")
-        sb.appendLine("- Food recommendations (vegetarian options if possible)")
-        sb.appendLine("- A summary budget estimate")
-        return sb.toString()
-    }
+        return """
+        You are an expert travel planner. Generate a detailed, day-by-day itinerary based on the following details.
+        Your response MUST be a single, valid JSON object and nothing else. Do not include any text or formatting like ```json before or after the JSON.
 
-    private fun extractOrigin(destination: String): String {
-        // Try to extract origin if format is "Origin → Destination" or "Origin to Destination"
-        return when {
-            destination.contains("→") -> {
-                destination.split("→").firstOrNull()?.trim() ?: ""
+        Destination: $destination
+        Travel Dates: $startDate to $endDate
+        Number of People: $peopleCount
+        Budget: $budget
+        Additional Preferences: $notes
+
+        Structure your response using the following JSON format:
+        {
+          "itinerary": [
+            {
+              "day": 1,
+              "date": "$startDate",
+              "activities": [
+                {
+                  "time": "Morning",
+                  "title": "Arrival and Hotel Check-in",
+                  "description": "Arrive at the destination, transfer to your hotel, and check in.",
+                  "type": "HOTEL"
+                },
+                {
+                  "time": "Afternoon",
+                  "title": "Explore the Local Market",
+                  "description": "Visit a local market for some initial sightseeing and to get a feel for the city.",
+                  "type": "ATTRACTION"
+                }
+              ]
             }
-            destination.contains(" to ", ignoreCase = true) -> {
-                destination.split(" to ", ignoreCase = true).firstOrNull()?.trim() ?: ""
-            }
-            else -> ""
+          ]
         }
+
+        - The root object must contain a single key: `itinerary`, which is an array of day objects.
+        - Each object in the `itinerary` array must have a `day` number, a `date` string, and an `activities` array.
+        - Each object in the `activities` array must have a `time`, `title`, `description`, and a `type`.
+        - The `type` field must be one of the following exact strings: FLIGHT, HOTEL, MEAL, ATTRACTION, TRANSPORT, GENERAL.
+        - Ensure the dates for each day are correctly incremented starting from the provided start date.
+        - Provide a complete plan for the entire duration of the trip.
+        """.trimIndent()
     }
 }
-
-

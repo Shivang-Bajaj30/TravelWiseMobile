@@ -23,6 +23,8 @@ class DayItineraryAdapter(
         val llActivities: LinearLayout = itemView.findViewById(R.id.llActivities)
         val ivDayImage: ImageView = itemView.findViewById(R.id.ivDayImage)
         val viewDayConnector: View = itemView.findViewById(R.id.viewDayConnector)
+        val tvSummaryCounts: TextView = itemView.findViewById(R.id.tvSummaryCounts)
+        val llTags: LinearLayout = itemView.findViewById(R.id.llTags)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
@@ -64,6 +66,7 @@ class DayItineraryAdapter(
 
         // Remove existing activity views
         holder.llActivities.removeAllViews()
+        holder.llTags.removeAllViews()
 
         // Add activities for this day
         dayItinerary.activities.forEachIndexed { index, activity ->
@@ -104,6 +107,31 @@ class DayItineraryAdapter(
             viewDot.setBackgroundResource(dotDrawable)
 
             holder.llActivities.addView(activityView)
+        }
+
+        // Summary counts
+        val totalActivities = dayItinerary.activities.size
+        val byType = dayItinerary.activities.groupBy { it.type }
+        val highlights = mutableListOf<String>()
+        if (byType.containsKey(ActivityType.ATTRACTION)) highlights.add("Attractions")
+        if (byType.containsKey(ActivityType.MEAL)) highlights.add("Food")
+        if (byType.containsKey(ActivityType.HOTEL)) highlights.add("Stay")
+        if (byType.containsKey(ActivityType.FLIGHT) || byType.containsKey(ActivityType.TRANSPORT)) highlights.add("Transport")
+
+        holder.tvSummaryCounts.text = "Activities: $totalActivities"
+
+        // Add tag chips
+        val context = holder.itemView.context
+        highlights.forEach { tag ->
+            val tv = TextView(context)
+            tv.text = tag
+            tv.setTextColor(context.getColor(R.color.text_primary))
+            tv.textSize = 12f
+            tv.setBackgroundResource(R.drawable.chip_tag_bg)
+            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            params.setMargins(0, 0, 8, 0)
+            tv.layoutParams = params
+            holder.llTags.addView(tv)
         }
     }
 

@@ -21,6 +21,19 @@ enum class ActivityType {
     HOTEL,
     ATTRACTION,
     MEAL,
-    TRANSPORT
+    TRANSPORT;
+
+    companion object {
+        fun fromString(type: String?): ActivityType {
+            return when (type?.uppercase()) {
+                "FLIGHT" -> FLIGHT
+                "HOTEL" -> HOTEL
+                "ATTRACTION" -> ATTRACTION
+                "MEAL" -> MEAL
+                "TRANSPORT" -> TRANSPORT
+                else -> GENERAL
+            }
+        }
+    }
 }
 
