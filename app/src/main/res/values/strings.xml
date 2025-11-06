@@ -13,4 +13,6 @@
     <string name="background">Background</string>
     <string name="back">Back</string>
     <string name="background2">Background</string>
+    <string name="destination_image_desc">Scenic view of %1$s</string>
+    <string name="share_itinerary">Share Itinerary</string>
 </resources>

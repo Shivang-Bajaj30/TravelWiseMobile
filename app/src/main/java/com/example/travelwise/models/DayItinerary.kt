@@ -4,7 +4,7 @@ data class DayItinerary(
     val dayNumber: Int = 1,
     val date: String = "",
     val dateFull: String = "",
-    val activities: List<ItineraryActivity> = emptyList(),
+    val activities: List<ItineraryActivityExtended> = emptyList(),
     val imageUrl: String = "" // Image URL for the day card
 )
 
@@ -13,6 +13,24 @@ data class ItineraryActivity(
     val title: String = "",
     val description: String = "",
     val type: ActivityType = ActivityType.GENERAL
+)
+
+data class HotelInfo(
+    val name: String = "",
+    val address: String = "",
+    val image: String = ""
+)
+
+// Extended activity model with optional image/hotel fields
+data class ItineraryActivityExtended(
+    val time: String = "",
+    val title: String = "",
+    val description: String = "",
+    val type: ActivityType = ActivityType.GENERAL,
+    val image: String = "",
+    val imageSource: String = "",
+    val imageCredit: String = "",
+    val hotel: HotelInfo? = null
 )
 
 enum class ActivityType {

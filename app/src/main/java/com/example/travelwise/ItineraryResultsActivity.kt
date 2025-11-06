@@ -10,6 +10,8 @@ import com.example.travelwise.adapters.DayItineraryAdapter
 import com.example.travelwise.databinding.ActivityItineraryResultsBinding
 import com.example.travelwise.models.ActivityType
 import com.example.travelwise.models.DayItinerary
+import com.example.travelwise.models.ItineraryActivityExtended
+import com.example.travelwise.models.HotelInfo
 import com.example.travelwise.models.ItineraryActivity
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -23,20 +25,31 @@ data class AIResponse(
 data class AIDay(
     @SerializedName("day") val day: Int?,
     @SerializedName("date") val date: String?,
-    @SerializedName("activities") val activities: List<AIActivity>?
+    @SerializedName("activities") val activities: List<Any>?
 )
 
-data class AIActivity(
+data class AIHotel(
+    @SerializedName("name") val name: String?,
+    @SerializedName("address") val address: String?,
+    @SerializedName("image") val image: String?
+)
+
+data class AIActivityExtended(
     @SerializedName("time") val time: String?,
     @SerializedName("title") val title: String?,
     @SerializedName("description") val description: String?,
-    @SerializedName("type") val type: String?
+    @SerializedName("type") val type: String?,
+    @SerializedName("image") val image: String?,
+    @SerializedName("image_source") val imageSource: String?,
+    @SerializedName("image_credit") val imageCredit: String?,
+    @SerializedName("hotel") val hotel: AIHotel?
 )
 
 class ItineraryResultsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityItineraryResultsBinding
     private lateinit var dayItineraryAdapter: DayItineraryAdapter
+    private lateinit var filteredAdapter: com.example.travelwise.adapters.FilteredActivityAdapter
     private val dayItineraries = mutableListOf<DayItinerary>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +68,42 @@ class ItineraryResultsActivity : AppCompatActivity() {
         setupBackButton()
         setupHeader(destination, startDate, endDate, peopleCount)
         setupRecyclerView()
+        setupFilterBar()
         parseAndDisplayItinerary(itineraryJson)
+    }
+
+    private fun setupFilterBar() {
+        val btnOverall = binding.root.findViewById<android.view.View>(R.id.btnFilterOverall)
+        val btnHotels = binding.root.findViewById<android.view.View>(R.id.btnFilterHotels)
+        val btnAttractions = binding.root.findViewById<android.view.View>(R.id.btnFilterAttractions)
+        val btnFlights = binding.root.findViewById<android.view.View>(R.id.btnFilterFlights)
+        val btnMeals = binding.root.findViewById<android.view.View>(R.id.btnFilterMeals)
+        val btnTransport = binding.root.findViewById<android.view.View>(R.id.btnFilterTransport)
+
+        filteredAdapter = com.example.travelwise.adapters.FilteredActivityAdapter(emptyList())
+        val rvFiltered = binding.root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvFilteredActivities)
+        rvFiltered.layoutManager = LinearLayoutManager(this)
+        rvFiltered.adapter = filteredAdapter
+
+        btnOverall.setOnClickListener {
+            // Show overall day-by-day
+            binding.root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvDayItinerary).visibility = android.view.View.VISIBLE
+            rvFiltered.visibility = android.view.View.GONE
+        }
+
+        fun showFiltered(type: com.example.travelwise.models.ActivityType) {
+            // Flatten all activities across days for the selected type
+            val flat = dayItineraries.flatMap { it.activities }.filter { it.type == type }
+            filteredAdapter.update(flat)
+            binding.root.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvDayItinerary).visibility = android.view.View.GONE
+            rvFiltered.visibility = android.view.View.VISIBLE
+        }
+
+        btnHotels.setOnClickListener { showFiltered(com.example.travelwise.models.ActivityType.HOTEL) }
+        btnAttractions.setOnClickListener { showFiltered(com.example.travelwise.models.ActivityType.ATTRACTION) }
+        btnFlights.setOnClickListener { showFiltered(com.example.travelwise.models.ActivityType.FLIGHT) }
+        btnMeals.setOnClickListener { showFiltered(com.example.travelwise.models.ActivityType.MEAL) }
+        btnTransport.setOnClickListener { showFiltered(com.example.travelwise.models.ActivityType.TRANSPORT) }
     }
 
     private fun setupBackButton() {
@@ -108,15 +156,59 @@ class ItineraryResultsActivity : AppCompatActivity() {
         val cleanedJson = json.removePrefix("```json").removeSuffix("```").trim()
         
         val aiResponse = Gson().fromJson(cleanedJson, AIResponse::class.java)
-        
+        val gson = Gson()
         return aiResponse?.itinerary?.mapNotNull { aiDay ->
-            val activities = aiDay?.activities?.mapNotNull { aiActivity ->
-                if (aiActivity?.title == null) null else ItineraryActivity(
-                    time = aiActivity.time ?: "",
-                    title = aiActivity.title,
-                    description = aiActivity.description ?: "",
-                    type = ActivityType.fromString(aiActivity.type)
-                )
+            val rawList = aiDay?.activities as? List<*>
+            val activities = rawList?.mapNotNull { rawAct ->
+                when (rawAct) {
+                    is Map<*, *> -> {
+                        val title = rawAct["title"] as? String ?: rawAct["name"] as? String
+                        if (title == null) return@mapNotNull null
+                        val time = rawAct["time"] as? String ?: ""
+                        val description = rawAct["description"] as? String ?: ""
+                        val typeStr = rawAct["type"] as? String
+                        val image = rawAct["image"] as? String ?: ""
+                        val hotelMap = rawAct["hotel"] as? Map<*, *>
+                        val hotel = if (hotelMap != null) {
+                            HotelInfo(
+                                name = hotelMap["name"] as? String ?: "",
+                                address = hotelMap["address"] as? String ?: "",
+                                image = hotelMap["image"] as? String ?: ""
+                            )
+                        } else null
+
+                        ItineraryActivityExtended(
+                            time = time,
+                            title = title,
+                            description = description,
+                            type = ActivityType.fromString(typeStr),
+                            image = image,
+                            imageSource = rawAct["image_source"] as? String ?: "",
+                            imageCredit = rawAct["image_credit"] as? String ?: "",
+                            hotel = hotel
+                        )
+                    }
+                    else -> {
+                        try {
+                            val json = gson.toJson(rawAct)
+                            val act = gson.fromJson(json, AIActivityExtended::class.java)
+                            if (act.title == null) return@mapNotNull null
+                            val hotelInfo = act.hotel?.let { HotelInfo(it.name ?: "", it.address ?: "", it.image ?: "") }
+                            ItineraryActivityExtended(
+                                time = act.time ?: "",
+                                title = act.title,
+                                description = act.description ?: "",
+                                type = ActivityType.fromString(act.type),
+                                image = act.image ?: "",
+                                imageSource = act.imageSource ?: "",
+                                imageCredit = act.imageCredit ?: "",
+                                hotel = hotelInfo
+                            )
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                }
             } ?: emptyList()
 
             if (aiDay?.day == null || activities.isEmpty()) {
@@ -127,7 +219,7 @@ class ItineraryResultsActivity : AppCompatActivity() {
         } ?: emptyList()
     }
 
-    private fun createDayItinerary(dayNumber: Int, date: String, activities: List<ItineraryActivity>): DayItinerary {
+    private fun createDayItinerary(dayNumber: Int, date: String, activities: List<ItineraryActivityExtended>): DayItinerary {
         val parts = date.split(" ")
         val dateShort = if (parts.size >= 2) "${parts[0]} ${parts[1]}" else date
         return DayItinerary(

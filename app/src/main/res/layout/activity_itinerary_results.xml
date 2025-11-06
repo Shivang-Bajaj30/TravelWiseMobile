@@ -21,8 +21,9 @@
             <!-- Top Image with Overlay -->
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:background="@color/primary">
+                android:layout_height="240dp"
+                android:background="@color/primary"
+                android:foregroundGravity="bottom">
 
                 <ImageView
                     android:id="@+id/ivHeaderImage"
@@ -40,12 +41,24 @@
                 <!-- Back Button -->
                 <ImageButton
                     android:id="@+id/btnBack"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_margin="16dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_margin="12dp"
                     android:src="@drawable/ic_arrow_back"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Back"
+                    app:tint="@color/white" />
+
+                <!-- Share Button -->
+                <ImageButton
+                    android:id="@+id/btnShare"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_margin="12dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_share"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Share"
                     app:tint="@color/white" />
 
                 <!-- Destination Name and Details Overlay -->
@@ -92,18 +105,112 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="0dp"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp">
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="18dp"
+                android:paddingBottom="24dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvDayItinerary"
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:clipChildren="true"
-                    android:scrollbars="none"
-                    tools:listitem="@layout/item_day_itinerary" />
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:layout_marginBottom="12dp"
+                    app:cardUseCompatPadding="true">
+
+                    <!-- Filter bar: horizontal list of options -->
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fillViewport="true"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:background="@android:color/transparent"
+                        android:overScrollMode="never">
+
+                        <LinearLayout
+                            android:id="@+id/llFilterBar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp">
+
+                            <Button
+                                android:id="@+id/btnFilterOverall"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Overall" />
+
+                            <Button
+                                android:id="@+id/btnFilterHotels"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Hotels"
+                                android:layout_marginStart="12dp" />
+
+                            <Button
+                                android:id="@+id/btnFilterAttractions"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Places"
+                                android:layout_marginStart="12dp" />
+
+                            <Button
+                                android:id="@+id/btnFilterFlights"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Flights"
+                                android:layout_marginStart="12dp" />
+
+                            <Button
+                                android:id="@+id/btnFilterMeals"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Food"
+                                android:layout_marginStart="12dp" />
+
+                            <Button
+                                android:id="@+id/btnFilterTransport"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Transport"
+                                android:layout_marginStart="12dp" />
+
+                        </LinearLayout>
+
+                    </HorizontalScrollView>
+
+                    <!-- RecyclerView: overall day-by-day cards -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvDayItinerary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:clipChildren="true"
+                        android:scrollbars="none"
+                        tools:listitem="@layout/item_day_itinerary"
+                        android:padding="8dp" />
+
+                    <!-- RecyclerView: filtered flat activity list (hidden by default) -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvFilteredActivities"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:clipToPadding="false"
+                        android:clipChildren="true"
+                        android:scrollbars="none"
+                        tools:listitem="@layout/item_itinerary_activity"
+                        android:padding="8dp" />
+
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
