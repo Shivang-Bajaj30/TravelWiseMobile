@@ -1,6 +1,7 @@
 package com.example.travelwise
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -123,10 +124,21 @@ class AiTripPlanActivity : AppCompatActivity() {
                     val result = withContext(Dispatchers.IO) {
                         AiService().generateTripPlan(prompt)
                     }
-                    binding.tvOutput.text = result
+                    
+                    // Navigate to results page with generated itinerary
+                    val intent = Intent(this@AiTripPlanActivity, ItineraryResultsActivity::class.java).apply {
+                        putExtra("DESTINATION", dest)
+                        putExtra("ORIGIN", extractOrigin(dest)) // Try to extract origin if available
+                        putExtra("START_DATE", start)
+                        putExtra("END_DATE", end)
+                        putExtra("PEOPLE_COUNT", people)
+                        putExtra("ITINERARY_TEXT", result)
+                    }
+                    startActivity(intent)
+                    finish() // Close the form activity
                 } catch (e: Exception) {
+                    binding.tvOutput.visibility = View.VISIBLE
                     binding.tvOutput.text = "Failed to generate plan: ${e.message}"
-                } finally {
                     binding.btnGenerate.isEnabled = true
                     binding.btnGenerate.text = "Generate Plan"
                 }
@@ -158,6 +170,19 @@ class AiTripPlanActivity : AppCompatActivity() {
         sb.appendLine("- Food recommendations (vegetarian options if possible)")
         sb.appendLine("- A summary budget estimate")
         return sb.toString()
+    }
+
+    private fun extractOrigin(destination: String): String {
+        // Try to extract origin if format is "Origin → Destination" or "Origin to Destination"
+        return when {
+            destination.contains("→") -> {
+                destination.split("→").firstOrNull()?.trim() ?: ""
+            }
+            destination.contains(" to ", ignoreCase = true) -> {
+                destination.split(" to ", ignoreCase = true).firstOrNull()?.trim() ?: ""
+            }
+            else -> ""
+        }
     }
 }
 
