@@ -18,7 +18,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        // Expose Gemini API key via local.properties (not committed)
+        // Expose API keys via local.properties (not committed)
         val props = Properties()
         val localProps = rootProject.file("local.properties")
         if (localProps.exists()) {
@@ -26,10 +26,14 @@ android {
         }
         val geminiKey = props.getProperty("GEMINI_API_KEY")
         buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKey\"")
-
-        // Allow overriding the model from local.properties; default to flash-latest
+        // ...
         val geminiModel = props.getProperty("GEMINI_MODEL") ?: "gemini-1.5-flash-latest"
         buildConfigField("String", "GEMINI_MODEL", "\"$geminiModel\"")
+        // ...
+        val googleCseApiKey = props.getProperty("GOOGLE_CSE_API_KEY")
+        buildConfigField("String", "GOOGLE_CSE_API_KEY", "\"$googleCseApiKey\"")
+        val googleCseId = props.getProperty("GOOGLE_CSE_ID")
+        buildConfigField("String", "GOOGLE_CSE_ID", "\"$googleCseId\"")
     }
 
     buildTypes {
