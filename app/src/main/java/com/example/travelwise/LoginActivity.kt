@@ -4,12 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.travelwise.database.DatabaseHelper
 import com.example.travelwise.databinding.ActivityLoginBinding
 import com.example.travelwise.ui.home.HomeActivity
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,6 +20,12 @@ class LoginActivity : AppCompatActivity() {
 
         // Hide action bar
         supportActionBar?.hide()
+
+        // Initialize database helper
+        databaseHelper = DatabaseHelper(this)
+
+        // Debug: Print all users to Logcat (remove in production)
+        databaseHelper.printAllUsers()
 
         // Back button click listener
         binding.btnBack.setOnClickListener {
@@ -30,24 +38,34 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString().trim()
 
             if (validateInput(email, password)) {
-                // ✅ Extract username (first part of email)
-                val username = email.substringBefore("@")
+                // Authenticate user from database
+                val user = databaseHelper.authenticateUser(email, password)
+                
+                if (user != null) {
+                    // Login successful
+                    // ✅ Extract username (first part of full name or email)
+                    val username = user.fullName.substringBefore(" ")
 
-                // ✅ Persist session
-                val prefs = getSharedPreferences("TravelWisePrefs", MODE_PRIVATE)
-                prefs.edit()
-                    .putString("USERNAME", username)
-                    .putString("EMAIL", email)
-                    .putBoolean("LOGGED_IN", true)
-                    .apply()
+                    // ✅ Persist session
+                    val prefs = getSharedPreferences("TravelWisePrefs", MODE_PRIVATE)
+                    prefs.edit()
+                        .putString("USERNAME", username)
+                        .putString("EMAIL", email)
+                        .putBoolean("LOGGED_IN", true)
+                        .apply()
 
-                // ✅ Start HomeActivity and pass username
-                val intent = Intent(this, HomeActivity::class.java).apply {
-                    putExtra("USERNAME", username)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    // ✅ Start HomeActivity and pass username
+                    val intent = Intent(this, HomeActivity::class.java).apply {
+                        putExtra("USERNAME", username)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    startActivity(intent)
+                    finish()
+                } else {
+                    // Login failed - invalid credentials
+                    Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show()
+                    binding.etPassword.requestFocus()
                 }
-                startActivity(intent)
-                finish()
             }
         }
 

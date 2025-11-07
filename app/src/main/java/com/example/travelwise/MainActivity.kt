@@ -3,6 +3,7 @@ package com.example.travelwise
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.travelwise.database.DatabaseHelper
 import com.example.travelwise.databinding.ActivitySplashBinding
 import com.example.travelwise.ui.home.HomeActivity
 
@@ -19,6 +20,9 @@ class MainActivity : AppCompatActivity() {
 
         // Hide action bar for splash screen
         supportActionBar?.hide()
+
+        // Initialize database to ensure it's created (for Database Inspector)
+        DatabaseHelper(this).readableDatabase.close()
 
         binding.btnExplore.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
