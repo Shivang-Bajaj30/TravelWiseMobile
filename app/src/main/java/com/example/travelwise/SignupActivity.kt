@@ -3,9 +3,11 @@ package com.example.travelwise
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.travelwise.database.DatabaseHelper
+import com.example.travelwise.data.FirebaseUserRepository
+import com.example.travelwise.data.UserRepository
 import com.example.travelwise.databinding.ActivitySignupBinding
 import com.example.travelwise.models.User
 import com.example.travelwise.ui.home.HomeActivity
@@ -13,9 +15,10 @@ import com.example.travelwise.ui.home.HomeActivity
 class SignupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignupBinding
-    private lateinit var databaseHelper: DatabaseHelper
+    private lateinit var userRepository: UserRepository
     private var isPasswordVisible = false
     private var isConfirmPasswordVisible = false
+    private var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +28,8 @@ class SignupActivity : AppCompatActivity() {
         // Hide action bar
         supportActionBar?.hide()
 
-        // Initialize database helper
-        databaseHelper = DatabaseHelper(this)
+        // Initialize repository
+        userRepository = FirebaseUserRepository()
 
         setupPasswordToggles()
         setupClickListeners()
@@ -78,44 +81,57 @@ class SignupActivity : AppCompatActivity() {
             val termsAccepted = binding.cbTerms.isChecked
 
             if (validateInput(fullName, email, phone, password, confirmPassword, termsAccepted)) {
-                // Check if user already exists
-                if (databaseHelper.userExists(email)) {
-                    Toast.makeText(this, "Email already registered. Please login.", Toast.LENGTH_SHORT).show()
-                    binding.etEmail.requestFocus()
-                    return@setOnClickListener
-                }
+                setLoading(true)
+                userRepository.userExistsByEmail(email).addOnCompleteListener { existsTask ->
+                    if (!existsTask.isSuccessful) {
+                        setLoading(false)
+                        Toast.makeText(this, existsTask.exception?.localizedMessage ?: "Could not check user.", Toast.LENGTH_SHORT).show()
+                        return@addOnCompleteListener
+                    }
+                    val exists = existsTask.result == true
+                    if (exists) {
+                        setLoading(false)
+                        Toast.makeText(this, "Email already registered. Please login.", Toast.LENGTH_SHORT).show()
+                        binding.etEmail.requestFocus()
+                        return@addOnCompleteListener
+                    }
 
-                // Create user object
-                val user = User(
-                    fullName = fullName,
-                    email = email,
-                    phone = phone,
-                    password = password
-                )
+                    userRepository.signUp(email, password, fullName, phone).addOnCompleteListener { authTask ->
+                        if (authTask.isSuccessful) {
+                            val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+                            if (uid == null) {
+                                setLoading(false)
+                                Toast.makeText(this, "Registration failed. Try again.", Toast.LENGTH_SHORT).show()
+                                return@addOnCompleteListener
+                            }
 
-                // Insert user into database
-                val result = databaseHelper.insertUser(user)
-                
-                if (result > 0) {
-                    // Success - user registered
-                    Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT).show()
-                    
-                    // ✅ Persist session
-                    val username = fullName.substringBefore(" ")
-                    val prefs = getSharedPreferences("TravelWisePrefs", MODE_PRIVATE)
-                    prefs.edit()
-                        .putString("USERNAME", username)
-                        .putString("EMAIL", email)
-                        .putBoolean("LOGGED_IN", true)
-                        .apply()
-                    
-                    val intent = Intent(this, HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    finish()
-                } else {
-                    // Failed to insert
-                    Toast.makeText(this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show()
+                            val user = User(fullName = fullName, email = email, phone = phone, password = "")
+                            userRepository.saveUserProfile(uid, user).addOnCompleteListener { saveTask ->
+                                setLoading(false)
+                                if (saveTask.isSuccessful) {
+                                    Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT).show()
+
+                                    val username = fullName.substringBefore(" ")
+                                    val prefs = getSharedPreferences("TravelWisePrefs", MODE_PRIVATE)
+                                    prefs.edit()
+                                        .putString("USERNAME", username)
+                                        .putString("EMAIL", email)
+                                        .putBoolean("LOGGED_IN", true)
+                                        .apply()
+
+                                    val intent = Intent(this, HomeActivity::class.java)
+                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    startActivity(intent)
+                                    finish()
+                                } else {
+                                    Toast.makeText(this, "Failed to save profile. Try again.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            setLoading(false)
+                            Toast.makeText(this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
         }
@@ -227,5 +243,19 @@ class SignupActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+    private fun setLoading(loading: Boolean) {
+        if (isLoading == loading) return
+        isLoading = loading
+        binding.btnSignUp.isEnabled = !loading
+        binding.etFullName.isEnabled = !loading
+        binding.etEmail.isEnabled = !loading
+        binding.etPhone.isEnabled = !loading
+        binding.etPassword.isEnabled = !loading
+        binding.etConfirmPassword.isEnabled = !loading
+        binding.cbTerms.isEnabled = !loading
+        binding.progressSignUp.visibility = if (loading) View.VISIBLE else View.GONE
+        binding.btnSignUp.text = if (loading) "Creating account..." else "Sign Up"
     }
 }

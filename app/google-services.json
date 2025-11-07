@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "122809020123",
+    "project_id": "travelwisemmobile",
+    "storage_bucket": "travelwisemmobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122809020123:android:cd16444e9cda09465566fe",
+        "android_client_info": {
+          "package_name": "com.example.travelwise"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEpm1m6vye5JHT3upDBuSHqRb1fYyt10I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
