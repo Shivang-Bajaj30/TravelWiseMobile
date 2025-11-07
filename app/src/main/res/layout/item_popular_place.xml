@@ -51,8 +51,8 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:src="@drawable/ic_star"
-                    android:tint="#FFD700"
-                    android:contentDescription="Rating"/>
+                    android:contentDescription="Rating"
+                    app:tint="#FFD700" />
 
                 <TextView
                     android:id="@+id/tvPlaceRating"

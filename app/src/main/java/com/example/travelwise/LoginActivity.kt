@@ -2,9 +2,11 @@ package com.example.travelwise
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.travelwise.data.FirebaseUserRepository
 import com.example.travelwise.data.UserRepository
 import com.example.travelwise.databinding.ActivityLoginBinding
@@ -14,6 +16,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private lateinit var userRepository: UserRepository
+    private var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,14 +40,17 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString().trim()
 
             if (validateInput(email, password)) {
+                setLoading(true)
                 userRepository.login(email, password).addOnCompleteListener { authTask ->
                     if (authTask.isSuccessful) {
                         val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
                         if (uid == null) {
+                            setLoading(false)
                             Toast.makeText(this, "Login failed. Try again.", Toast.LENGTH_SHORT).show()
                             return@addOnCompleteListener
                         }
                         userRepository.getUserProfile(uid).addOnCompleteListener { userTask ->
+                            setLoading(false)
                             val profile = userTask.result
                             val username = when {
                                 profile?.fullName?.isNotBlank() == true -> profile.fullName.substringBefore(" ")
@@ -63,8 +69,12 @@ class LoginActivity : AppCompatActivity() {
                             }
                             startActivity(intent)
                             finish()
+                        }.addOnFailureListener { error ->
+                            setLoading(false)
+                            Toast.makeText(this, error.localizedMessage ?: "Failed to load profile.", Toast.LENGTH_SHORT).show()
                         }
                     } else {
+                        setLoading(false)
                         val ex = authTask.exception
                         when {
                             ex is com.google.firebase.auth.FirebaseAuthInvalidUserException -> {
@@ -157,6 +167,22 @@ class LoginActivity : AppCompatActivity() {
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setCancelable(true)
                 .show()
+        }
+    }
+
+    private fun setLoading(loading: Boolean) {
+        if (isLoading == loading) return
+        isLoading = loading
+        binding.btnLogin.isEnabled = !loading
+        binding.etEmail.isEnabled = !loading
+        binding.etPassword.isEnabled = !loading
+        binding.progressLogin.visibility = if (loading) View.VISIBLE else View.GONE
+        if (loading) {
+            binding.btnLogin.text = "Logging in..."
+            binding.btnLogin.icon = null
+        } else {
+            binding.btnLogin.text = "Login"
+            binding.btnLogin.icon = ContextCompat.getDrawable(this, R.drawable.ic_arrow_forward)
         }
     }
 }

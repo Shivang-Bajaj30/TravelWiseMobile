@@ -3,6 +3,7 @@ package com.example.travelwise
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.travelwise.data.FirebaseUserRepository
@@ -17,6 +18,7 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var userRepository: UserRepository
     private var isPasswordVisible = false
     private var isConfirmPasswordVisible = false
+    private var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,9 +81,16 @@ class SignupActivity : AppCompatActivity() {
             val termsAccepted = binding.cbTerms.isChecked
 
             if (validateInput(fullName, email, phone, password, confirmPassword, termsAccepted)) {
+                setLoading(true)
                 userRepository.userExistsByEmail(email).addOnCompleteListener { existsTask ->
+                    if (!existsTask.isSuccessful) {
+                        setLoading(false)
+                        Toast.makeText(this, existsTask.exception?.localizedMessage ?: "Could not check user.", Toast.LENGTH_SHORT).show()
+                        return@addOnCompleteListener
+                    }
                     val exists = existsTask.result == true
                     if (exists) {
+                        setLoading(false)
                         Toast.makeText(this, "Email already registered. Please login.", Toast.LENGTH_SHORT).show()
                         binding.etEmail.requestFocus()
                         return@addOnCompleteListener
@@ -91,12 +100,14 @@ class SignupActivity : AppCompatActivity() {
                         if (authTask.isSuccessful) {
                             val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
                             if (uid == null) {
+                                setLoading(false)
                                 Toast.makeText(this, "Registration failed. Try again.", Toast.LENGTH_SHORT).show()
                                 return@addOnCompleteListener
                             }
 
                             val user = User(fullName = fullName, email = email, phone = phone, password = "")
                             userRepository.saveUserProfile(uid, user).addOnCompleteListener { saveTask ->
+                                setLoading(false)
                                 if (saveTask.isSuccessful) {
                                     Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT).show()
 
@@ -117,6 +128,7 @@ class SignupActivity : AppCompatActivity() {
                                 }
                             }
                         } else {
+                            setLoading(false)
                             Toast.makeText(this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -231,5 +243,19 @@ class SignupActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+    private fun setLoading(loading: Boolean) {
+        if (isLoading == loading) return
+        isLoading = loading
+        binding.btnSignUp.isEnabled = !loading
+        binding.etFullName.isEnabled = !loading
+        binding.etEmail.isEnabled = !loading
+        binding.etPhone.isEnabled = !loading
+        binding.etPassword.isEnabled = !loading
+        binding.etConfirmPassword.isEnabled = !loading
+        binding.cbTerms.isEnabled = !loading
+        binding.progressSignUp.visibility = if (loading) View.VISIBLE else View.GONE
+        binding.btnSignUp.text = if (loading) "Creating account..." else "Sign Up"
     }
 }
