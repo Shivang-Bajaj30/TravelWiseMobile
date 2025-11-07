@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -78,6 +79,11 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.amazon.ion:ion-java:1.11.1")
     implementation("com.google.ai.client.generativeai:generativeai:0.7.0")
+
+    // Firebase (BoM-managed)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
     // Testing
     testImplementation(libs.junit)
