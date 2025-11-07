@@ -3,6 +3,7 @@ package com.example.travelwise
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.travelwise.database.DatabaseHelper
 import com.example.travelwise.databinding.ActivityLoginBinding
@@ -23,6 +24,9 @@ class LoginActivity : AppCompatActivity() {
 
         // Initialize database helper
         databaseHelper = DatabaseHelper(this)
+        
+        // Initialize database for Database Inspector
+        databaseHelper.initializeDatabase()
 
         // Debug: Print all users to Logcat (remove in production)
         databaseHelper.printAllUsers()
@@ -38,33 +42,40 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString().trim()
 
             if (validateInput(email, password)) {
-                // Authenticate user from database
-                val user = databaseHelper.authenticateUser(email, password)
-                
-                if (user != null) {
-                    // Login successful
-                    // ✅ Extract username (first part of full name or email)
-                    val username = user.fullName.substringBefore(" ")
-
-                    // ✅ Persist session
-                    val prefs = getSharedPreferences("TravelWisePrefs", MODE_PRIVATE)
-                    prefs.edit()
-                        .putString("USERNAME", username)
-                        .putString("EMAIL", email)
-                        .putBoolean("LOGGED_IN", true)
-                        .apply()
-
-                    // ✅ Start HomeActivity and pass username
-                    val intent = Intent(this, HomeActivity::class.java).apply {
-                        putExtra("USERNAME", username)
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                    startActivity(intent)
-                    finish()
+                // First check if user exists in database
+                if (!databaseHelper.userExists(email)) {
+                    // User doesn't exist - show popup to create account
+                    showNoAccountDialog(email)
                 } else {
-                    // Login failed - invalid credentials
-                    Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show()
-                    binding.etPassword.requestFocus()
+                    // User exists - authenticate with password
+                    val user = databaseHelper.authenticateUser(email, password)
+                    
+                    if (user != null) {
+                        // Login successful
+                        // ✅ Extract username (first part of full name or email)
+                        val username = user.fullName.substringBefore(" ")
+
+                        // ✅ Persist session
+                        val prefs = getSharedPreferences("TravelWisePrefs", MODE_PRIVATE)
+                        prefs.edit()
+                            .putString("USERNAME", username)
+                            .putString("EMAIL", email)
+                            .putBoolean("LOGGED_IN", true)
+                            .apply()
+
+                        // ✅ Start HomeActivity and pass username
+                        val intent = Intent(this, HomeActivity::class.java).apply {
+                            putExtra("USERNAME", username)
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        // User exists but password is wrong
+                        Toast.makeText(this, "Invalid password. Please try again.", Toast.LENGTH_SHORT).show()
+                        binding.etPassword.requestFocus()
+                        binding.etPassword.text?.clear()
+                    }
                 }
             }
         }
@@ -120,6 +131,26 @@ class LoginActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+    /**
+     * Show dialog when user account doesn't exist
+     */
+    private fun showNoAccountDialog(email: String) {
+        if (!isFinishing && !isDestroyed) {
+            AlertDialog.Builder(this)
+                .setTitle("Account Not Found")
+                .setMessage("No account found with email: $email\n\nPlease create an account to continue.")
+                .setPositiveButton("Create Account") { _, _ ->
+                    // Navigate to SignupActivity
+                    val intent = Intent(this, SignupActivity::class.java)
+                    startActivity(intent)
+                }
+                .setNegativeButton("Cancel", null)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setCancelable(true)
+                .show()
+        }
     }
 }
 

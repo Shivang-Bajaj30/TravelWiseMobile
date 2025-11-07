@@ -207,7 +207,20 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
      * Get database path (for debugging - to locate the database file)
      */
     fun getDatabasePath(): String {
-        return readableDatabase.path
+        val db = readableDatabase
+        val path = db.path
+        // Don't close here - let SQLiteOpenHelper manage it
+        return path
+    }
+
+    /**
+     * Initialize database for Database Inspector
+     * This ensures the database is created and accessible
+     */
+    fun initializeDatabase() {
+        // Just access the database to ensure it's created
+        // SQLiteOpenHelper manages connections automatically
+        readableDatabase.version
     }
 }
 

@@ -10,6 +10,7 @@ import com.example.travelwise.ui.home.HomeActivity
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashBinding
+    private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -22,7 +23,8 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         // Initialize database to ensure it's created (for Database Inspector)
-        DatabaseHelper(this).readableDatabase.close()
+        databaseHelper = DatabaseHelper(this)
+        databaseHelper.initializeDatabase()
 
         binding.btnExplore.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
